@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/*
+  Design tokens for DISTRICT 19.
+  Source: design-system/district-19/MASTER.md, with the shop overrides from
+  design-system/district-19/pages/storefront.md.
+*/
+@theme {
+  --color-background: #fafaf9;
+  --color-paper: #ffffff;
+  --color-foreground: #0c0a09;
+  --color-primary: #1c1917;
+  --color-on-primary: #ffffff;
+  --color-secondary: #44403c;
+  --color-accent: #a16207;
+  --color-on-accent: #ffffff;
+  --color-muted: #f0efed;
+  --color-muted-foreground: #57534e;
+  --color-border: #d6d3d1;
+  --color-destructive: #dc2626;
+  --color-success: #15803d;
+  --color-ring: #1c1917;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-syne), var(--font-manrope), ui-sans-serif, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+
+  --animate-drift: drift 9s ease-in-out infinite;
+  --animate-swing: swing 900ms var(--ease-out-expo);
+  --animate-gradient: gradient-drift 30s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+:root {
+  --dur-fast: 180ms;
+  --dur-base: 400ms;
+  --dur-scene: 600ms;
+  --header-h: 4rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+/* One visible focus style everywhere (skill: focus-states). */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 3px;
+}
+
+a,
+button,
+[role="button"],
+select,
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide scrollbars on the horizontal scenes; arrow buttons and keys still work. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Scene: the rail ---------- */
+
+.rail-gradient {
+  background: linear-gradient(
+    115deg,
+    #d9f2e4 0%,
+    #e6e1f7 32%,
+    #f9e6da 62%,
+    #dff0f4 100%
+  );
+  background-size: 220% 220%;
+  animation: var(--animate-gradient);
+}
+
+.hanger-swing {
+  transform-origin: 50% 0%;
+}
+.rail-item:hover .hanger-swing,
+.rail-item:focus-visible .hanger-swing {
+  animation: var(--animate-swing);
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(4.5deg);
+  }
+  55% {
+    transform: rotate(-2.5deg);
+  }
+  80% {
+    transform: rotate(1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes gradient-drift {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+/* ---------- Scene: the float ---------- */
+
+.float-item {
+  position: absolute;
+  left: var(--mx);
+  top: var(--my);
+  width: var(--mw);
+  /* Pointer parallax: the stage sets --px / --py between -1 and 1. */
+  translate: calc(var(--px, 0) * var(--depth) * -28px)
+    calc(var(--py, 0) * var(--depth) * -20px);
+  transition: translate 700ms var(--ease-out-expo);
+}
+@media (min-width: 768px) {
+  .float-item {
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+  }
+}
+
+.float-drift {
+  animation: var(--animate-drift);
+  animation-delay: var(--delay, 0s);
+  animation-duration: var(--speed, 9s);
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) rotate(calc(var(--tilt, 0deg) + 2deg));
+  }
+}
+
+/* ---------- Marquee ---------- */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- Product spin ---------- */
+
+.spin-stage {
+  perspective: 1400px;
+}
+.spin-plane {
+  transform-style: preserve-3d;
+}
+.spin-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ---------- Route transition: one shared product per navigation ---------- */
+
+::view-transition-group(.morph) {
+  animation-duration: 600ms;
+  animation-timing-function: var(--ease-in-out-expo);
+}
+::view-transition-old(root) {
+  animation-duration: 260ms;
+}
+::view-transition-new(root) {
+  animation-duration: 400ms;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rail-gradient,
+  .float-drift,
+  .marquee-track,
+  .rail-item:hover .hanger-swing,
+  .rail-item:focus-visible .hanger-swing {
+    animation: none;
+  }
+  .float-item {
+    translate: none;
+    transition: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms !important;
+  }
+}
